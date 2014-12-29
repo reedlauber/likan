@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-var likan = require('../index')('postgres://reedlauber:5432@localhost/likan_test');
+var likan = require('../index')('postgres://reed:5432@localhost/likan_test');
 var params = require('../lib/params');
 var sql = require('../lib/sql');
 
@@ -42,6 +42,33 @@ describe('likan', function() {
   });
 
   describe('sql', function() {
+    describe('assign_alias', function() {
+      it('should do nothing if no alias is given', function() {
+        var wheres = ['foo = ?'];
+        var assigned = sql._assign_alias(null, wheres);
+        assert.equal(wheres, assigned);
+      });
+
+      it('should prepend alias if not present', function() {
+        var wheres = ['foo = ?'];
+        var assigned = sql._assign_alias('a', wheres);
+        assert.equal('a.foo = ?', assigned[0]);
+      });
+
+      it('should leave alias if manually set', function() {
+        var wheres = ['b.foo = ?'];
+        var assigned = sql._assign_alias('a', wheres);
+        assert.equal('b.foo = ?', assigned[0]);
+      });
+
+      it('should only assign needed aliases', function() {
+        var wheres = ['foo = ?', 'b.bar = ?'];
+        var assigned = sql._assign_alias('a', wheres);
+        assert.equal('a.foo = ?', assigned[0]);
+        assert.equal('b.bar = ?', assigned[1]);
+      });
+    });
+
     describe('select', function() {
       it('should generate select query', function() {
         var sql_text = sql.select('cats');
@@ -49,39 +76,39 @@ describe('likan', function() {
       });
 
       it('should override select', function() {
-        var sql_text = sql.select('cats', 'color, hair');
+        var sql_text = sql.select('cats', { columns:'color, hair' });
         assert.equal('SELECT color, hair FROM cats;', sql_text);
       });
 
       it('should override joins', function() {
         var join_statement = 'JOIN places ON cats.place = places.id';
-        var sql_text = sql.select('cats', null, join_statement);
+        var sql_text = sql.select('cats', { joins:join_statement });
         assert.equal('SELECT * FROM cats ' + join_statement + ';', sql_text);
       });
 
       it('should override where', function() {
-        var sql_text = sql.select('cats', null, null, 'color = ?');
+        var sql_text = sql.select('cats', { wheres:['color = ?'] });
         assert.equal('SELECT * FROM cats WHERE color = ?;', sql_text);
       });
 
       it('should set args', function() {
-        var sql_text = sql.select('cats', null, null, 'color = ?', ['green']);
+        var sql_text = sql.select('cats', { wheres:['color = ?'], params:['green'] });
         assert.equal('SELECT * FROM cats WHERE color = $1;', sql_text);
       });
     });
   });
 
-  describe('query', function() {
-    it('should be able to run a query', function() {
-      model.query().done(function(results) {
+  describe('select', function() {
+    it('should be able to run a select query', function(done) {
+      model.select().commit(function(results) {
         assert.equal(results.length, 2);
         done();
       });
     });
 
-    it('should return single object for "first"', function() {
-      model.query().first(function(result) {
-        assert.equal(typeof result.id, 'wat');
+    it('should return single object for "first"', function(done) {
+      model.select().first(function(result) {
+        assert.equal(typeof result.id, 'number');
         done();
       });
     });
