@@ -112,5 +112,26 @@ describe('likan', function() {
         done();
       });
     });
+
+    it('should alias "all" to "commit"', function(done) {
+      model.select().all(function(results) {
+        assert.equal(results.length, 2);
+        done();
+      });
+    });
+
+    it('should alias "find" to "commit"', function(done) {
+      model.select().find(function(results) {
+        assert.equal(results.length, 2);
+        done();
+      });
+    });
+
+    it('should allow quick callbacks', function(done) {
+      model.select(function(results) {
+        assert.equal(results.length, 2);
+        done();
+      });
+    });
   });
 });
