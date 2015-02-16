@@ -9,7 +9,7 @@ describe('likan', function() {
   var model;
 
   beforeEach(function() {
-    model = likan.create('cats');
+    model = likan.create('cats', { no_dates:true });
   });
 
   describe('Model', function() {
@@ -131,6 +131,23 @@ describe('likan', function() {
     it('should allow quick callbacks', function(done) {
       model.select(function(results) {
         assert.equal(results.length, 2);
+        done();
+      });
+    });
+  });
+
+  describe('insert', function() {
+    var color = 'tortoise';
+
+    afterEach(function(done) {
+      model.delete('color = ?', [color]).commit(done);
+    });
+
+    it('should insert a row', function(done) {
+      model.insert({ color:color }).commit(function(record) {
+        assert.equal(typeof record, 'object');
+        assert.equal(typeof record.id, 'number');
+        assert.equal(record.color, color);
         done();
       });
     });
