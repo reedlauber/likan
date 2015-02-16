@@ -9,7 +9,7 @@ describe('likan', function() {
   var model;
 
   beforeEach(function() {
-    model = likan.create('cats', { no_dates:true });
+    model = likan.create('cats', { dates:false });
   });
 
   describe('Model', function() {
