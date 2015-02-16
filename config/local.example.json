@@ -1,0 +1,3 @@
+{
+  "test_database_path": "postgres://username:5432@localhost/likan_test"
+}

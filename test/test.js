@@ -1,6 +1,7 @@
 var assert = require('assert');
+var config = require('../config/local.json');
 
-var likan = require('../index')('postgres://reed:5432@localhost/likan_test');
+var likan = require('../index')(config.test_database_path);
 var params = require('../lib/params');
 var sql = require('../lib/sql');
 
