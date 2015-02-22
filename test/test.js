@@ -134,6 +134,54 @@ describe('likan', function() {
         done();
       });
     });
+
+    it('should handle params as array', function(done) {
+      model.select()
+        .where('foo = ?', ['bar'])
+        .sql(function(sql, params) {
+          assert.equal(sql, 'SELECT * FROM cats as c WHERE c.foo = $1;');
+          assert.equal(params.length, 1);
+          assert.equal(params[0], 'bar');
+          done();
+        });
+    });
+
+    it('should handle params as single value', function(done) {
+      model.select()
+        .where('foo = ?', 'bar')
+        .sql(function(sql, params) {
+          assert.equal(sql, 'SELECT * FROM cats as c WHERE c.foo = $1;');
+          assert.equal(params.length, 1);
+          assert.equal(params[0], 'bar');
+          done();
+        });
+    });
+
+    it('should handle params across multiple wheres', function(done) {
+      model.select()
+        .where('foo = ?', 'bar')
+        .where('wut = ?', ['wat'])
+        .sql(function(sql, params) {
+          assert.equal(sql, 'SELECT * FROM cats as c WHERE c.foo = $1 AND c.wut = $2;');
+          assert.equal(params.length, 2);
+          assert.equal(params[0], 'bar');
+          assert.equal(params[1], 'wat');
+          done();
+        });
+    });
+
+    it('should include JOIN params', function(done) {
+      model.select()
+        .join('toys t ON t.name = ?', 'mouse')
+        .where('foo = ?', 'bar')
+        .sql(function(sql, params) {
+          assert.equal(sql, 'SELECT * FROM cats as c JOIN toys t ON t.name = $1 WHERE c.foo = $2;');
+          assert.equal(params.length, 2);
+          assert.equal(params[0], 'mouse');
+          assert.equal(params[1], 'bar');
+          done();
+        });
+    });
   });
 
   describe('insert', function() {
