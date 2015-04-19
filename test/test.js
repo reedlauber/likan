@@ -4,6 +4,7 @@ var config = require('../config/local.json');
 var likan = require('../index')(config.test_database_path);
 var params = require('../lib/params');
 var sql = require('../lib/sql');
+var processor = require('../lib/processor');
 
 describe('likan', function() {
   var model;
@@ -198,6 +199,52 @@ describe('likan', function() {
         assert.equal(record.color, color);
         done();
       });
+    });
+  });
+
+  describe('processor', function() {
+    var datum;
+
+    beforeEach(function() {
+      datum = { a:'b', c:'d', e:123 };
+    });
+
+    it('should do nothing if no public fields are supplied', function(done) {
+      processor.process(datum, null, function(processed) {
+        assert.equal(processed, datum);
+        done();
+      });
+    });
+
+    it('should limit to public fields', function(done) {
+      processor.process(datum, ['a', 'c'], function(processed) {
+        assert.equal(typeof processed.e, 'undefined');
+        done();
+      });
+    });
+
+    it('should handle arrays', function(done) {
+      var datum2 = { a:'z', c:'y', f:987 };
+      var data = [datum, datum2];
+
+      processor.process(data, ['a', 'c'], function(processed) {
+        assert.equal(processed[0].a, datum.a);
+        assert.equal(processed[1].a, datum2.a);
+        assert.equal(typeof processed[0].e, 'undefined');
+        assert.equal(typeof processed[1].f, 'undefined');
+        done();
+      });
+    });
+
+    it('should process after selects', function(done) {
+      model = likan.create('cats', { dates:false, public_fields:['color'] });
+
+      model.select()
+        .first(function(record) {
+          assert.equal(typeof record.cat_name, 'undefined');
+          assert.equal(typeof record.id, 'number');
+          done();
+        });
     });
   });
 });
