@@ -69,6 +69,18 @@ describe('likan', function() {
         assert.equal('a.foo = ?', assigned[0]);
         assert.equal('b.bar = ?', assigned[1]);
       });
+
+      it('should handle multi-part (complex) clauses', function() {
+        var wheres = ['foo = ? OR bar = ?'];
+        var assigned = sql._assign_alias('a', wheres);
+        assert.equal('a.foo = ? OR a.bar = ?', assigned[0]);
+      });
+
+      it('should handle clauses inside functions', function() {
+        var wheres = ['lower(foo) = ? OR lower(b.bar) = ?'];
+        var assigned = sql._assign_alias('a', wheres);
+        assert.equal('lower(a.foo) = ? OR lower(b.bar) = ?', assigned[0]);
+      });
     });
 
     describe('select', function() {
