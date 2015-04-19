@@ -246,5 +246,16 @@ describe('likan', function() {
           done();
         });
     });
+
+    it('should not process if processing is turned off', function(done) {
+      model = likan.create('cats', { dates:false, public_fields:['color'] });
+
+      model.select()
+        .process(false)
+        .first(function(record) {
+          assert.notEqual(typeof record.cat_name, 'undefined');
+          done();
+        });
+    });
   });
 });
