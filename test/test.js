@@ -195,6 +195,18 @@ describe('likan', function() {
           done();
         });
     });
+
+    it('should use custom post-processor', function(done) {
+      var added_field_value = 'something';
+      model.process = function(data, callback) {
+        data.added = added_field_value;
+        callback(data);
+      };
+      model.select().first(function(record) {
+        assert.equal(record.added, added_field_value)
+        done();
+      });
+    });
   });
 
   describe('insert', function() {
@@ -222,14 +234,14 @@ describe('likan', function() {
     });
 
     it('should do nothing if no public fields are supplied', function(done) {
-      processor.process(datum, null, function(processed) {
+      processor.public(datum, null, function(processed) {
         assert.equal(processed, datum);
         done();
       });
     });
 
     it('should limit to public fields', function(done) {
-      processor.process(datum, ['a', 'c'], function(processed) {
+      processor.public(datum, ['a', 'c'], function(processed) {
         assert.equal(typeof processed.e, 'undefined');
         done();
       });
@@ -239,7 +251,7 @@ describe('likan', function() {
       var datum2 = { a:'z', c:'y', f:987 };
       var data = [datum, datum2];
 
-      processor.process(data, ['a', 'c'], function(processed) {
+      processor.public(data, ['a', 'c'], function(processed) {
         assert.equal(processed[0].a, datum.a);
         assert.equal(processed[1].a, datum2.a);
         assert.equal(typeof processed[0].e, 'undefined');
