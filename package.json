@@ -1,7 +1,7 @@
 {
   "name": "likan",
   "description": "A lightweight data model and SQL execution for PostgreSQL library.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "engines": {
     "node": "0.10.x",
     "iojs": "1.2.x",
@@ -12,8 +12,8 @@
     "url": "git://github.com/reedlauber/likan.git"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.3",
     "pg": "~4.2.0"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

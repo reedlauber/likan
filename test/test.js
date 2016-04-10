@@ -34,6 +34,25 @@ describe('likan', function() {
       model = likan.create('cat', { alias:'z' });
       assert.equal(model.alias, 'z');
     });
+
+    it('should handle arrays for model processors', function(done) {
+      var a = 'b';
+      var datum = { a:a, c:'d', e:123 };
+      var datum2 = { a:'z', c:'y', f:987 };
+      var data = [datum, datum2];
+
+      model.process = function(datum, callback) {
+        datum.a = datum.a + datum.a;
+        callback(datum);
+      };
+
+      model._process(data, function(processed) {
+        assert.equal(processed instanceof Array, true);
+        assert.equal(processed.length, data.length);
+        assert.equal(processed[0].a, a + a);
+        done();
+      });
+    });
   });
 
   describe('params', function() {
@@ -247,7 +266,7 @@ describe('likan', function() {
       });
     });
 
-    it('should handle arrays', function(done) {
+    it('should handle arrays for public', function(done) {
       var datum2 = { a:'z', c:'y', f:987 };
       var data = [datum, datum2];
 
