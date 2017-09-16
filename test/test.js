@@ -1,7 +1,7 @@
 var assert = require('assert');
 var config = require('../config/local.json');
 
-var likan = require('../index')(config.test_database_path);
+var likan = require('../index')(config.test_database_path, { ssl:false });
 var params = require('../lib/params');
 var sql = require('../lib/sql');
 var processor = require('../lib/processor');
