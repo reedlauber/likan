@@ -31,7 +31,7 @@ describe('likan', function() {
     });
 
     it('should override with custom alias', function() {
-      model = likan.create('cat', { alias:'z' });
+      model = likan.create('cats', { alias:'z' });
       assert.equal(model.alias, 'z');
     });
 
@@ -134,7 +134,7 @@ describe('likan', function() {
   describe('select', function() {
     it('should be able to run a select query', function(done) {
       model.select().commit(function(results) {
-        assert.equal(results.length, 2);
+        assert.equal(results.length, 3);
         done();
       });
     });
@@ -148,21 +148,21 @@ describe('likan', function() {
 
     it('should alias "all" to "commit"', function(done) {
       model.select().all(function(results) {
-        assert.equal(results.length, 2);
+        assert.equal(results.length, 3);
         done();
       });
     });
 
     it('should alias "find" to "commit"', function(done) {
       model.select().find(function(results) {
-        assert.equal(results.length, 2);
+        assert.equal(results.length, 3);
         done();
       });
     });
 
     it('should allow quick callbacks', function(done) {
       model.select(function(results) {
-        assert.equal(results.length, 2);
+        assert.equal(results.length, 3);
         done();
       });
     });
@@ -198,6 +198,16 @@ describe('likan', function() {
           assert.equal(params.length, 2);
           assert.equal(params[0], 'bar');
           assert.equal(params[1], 'wat');
+          done();
+        });
+    });
+
+    it('should handle IN statements', function(done) {
+      model.select()
+        .where('c.color IN (?, ?)', ['black', 'orange'])
+        .sql(console.error)
+        .all(function(results) {
+          console.log('IN results', results);
           done();
         });
     });
