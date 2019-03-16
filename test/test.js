@@ -46,7 +46,7 @@ describe('likan', function() {
         callback(datum);
       };
 
-      model._process(data, function(processed) {
+      model._process(data, null, function(processed) {
         assert.equal(processed instanceof Array, true);
         assert.equal(processed.length, data.length);
         assert.equal(processed[0].a, a + a);
@@ -263,15 +263,22 @@ describe('likan', function() {
     });
 
     it('should do nothing if no public fields are supplied', function(done) {
-      processor.public(datum, null, function(processed) {
+      processor.public(datum, null, null, function(processed) {
         assert.equal(processed, datum);
         done();
       });
     });
 
     it('should limit to public fields', function(done) {
-      processor.public(datum, ['a', 'c'], function(processed) {
+      processor.public(datum, ['a', 'c'], null, function(processed) {
         assert.equal(typeof processed.e, 'undefined');
+        done();
+      });
+    });
+
+    it('should skip public limits when option is disabled', function(done) {
+      processor.public(datum, ['a', 'c'], { public: false }, function(processed) {
+        assert.equal(processed.e, datum.e);
         done();
       });
     });
@@ -280,7 +287,7 @@ describe('likan', function() {
       var datum2 = { a:'z', c:'y', f:987 };
       var data = [datum, datum2];
 
-      processor.public(data, ['a', 'c'], function(processed) {
+      processor.public(data, ['a', 'c'], null, function(processed) {
         assert.equal(processed[0].a, datum.a);
         assert.equal(processed[1].a, datum2.a);
         assert.equal(typeof processed[0].e, 'undefined');
