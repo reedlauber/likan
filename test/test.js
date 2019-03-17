@@ -11,6 +11,7 @@ describe('likan', function() {
 
   beforeEach(function() {
     model = likan.create('cats', { dates:false });
+    restricted_model = likan.create('cats', { dates:false, public_fields:['id', 'cat_name'] });
   });
 
   describe('Model', function() {
@@ -233,6 +234,22 @@ describe('likan', function() {
       };
       model.select().first(function(record) {
         assert.equal(record.added, added_field_value)
+        done();
+      });
+    });
+
+    it('should strict to public fields only', function(done) {
+      restricted_model.select().first(function(record) {
+        assert.equal(typeof record.id, 'number');
+        assert.equal(typeof record.cat_name, 'string');
+        assert.equal(typeof record.color, 'undefined');
+        done();
+      });
+    });
+
+    it('should show all fields when `public` is false', function(done) {
+      restricted_model.select({ public:false }).first(function(record) {
+        assert.equal(typeof record.color, 'string');
         done();
       });
     });
