@@ -206,9 +206,7 @@ describe('likan', function() {
     it('should handle IN statements', function(done) {
       model.select()
         .where('c.color IN (?, ?)', ['black', 'orange'])
-        .sql(console.error)
         .all(function(results) {
-          console.log('IN results', results);
           done();
         });
     });
