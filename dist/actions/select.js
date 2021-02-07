@@ -43,124 +43,120 @@ var SelectAction = /** @class */ (function (_super) {
         _this.joins = [];
         _this.query = { params: [], shouldProcess: true, wheres: [] };
         _this.processOptions = null;
+        // Query-building Methods
+        _this.alias = function (aliasName) {
+            _this.query.alias = aliasName;
+            return _this;
+        };
+        _this.columns = function (columns) {
+            _this.query.columns = columns;
+            return _this;
+        };
+        _this.groupBy = function (groupBys) {
+            _this.query.groupBy = groupBys;
+            return _this;
+        };
+        _this.group_by = function (group_bys) {
+            return _this.groupBy(group_bys);
+        };
+        _this.join = function (join, params, type) {
+            type = type || 'JOIN';
+            _this.joins.push(type + " " + join);
+            _this.query.joins = _this.joins.join(' ');
+            addParamsToQuery(_this.query, params);
+            return _this;
+        };
+        _this.limit = function (limit) {
+            _this.query.limit = limit;
+            return _this;
+        };
+        _this.offset = function (offset) {
+            _this.query.offset = offset;
+            return _this;
+        };
+        _this.orders = function (orderBys) {
+            _this.query.orders = orderBys;
+            return _this;
+        };
+        _this.params = function (params) {
+            _this.query.params = params;
+            return _this;
+        };
+        _this.process = function (shouldProcess) {
+            if (typeof shouldProcess === 'object') {
+                _this.processOptions = shouldProcess;
+                _this.query.shouldProcess = true;
+            }
+            else {
+                _this.query.shouldProcess = shouldProcess;
+            }
+            return _this;
+        };
+        _this.sql = function (callback) {
+            var sql = sql_1.select(_this.model.table, _this.query);
+            if (callback) {
+                callback(sql, _this.query.params);
+            }
+            else {
+                console.log(sql, _this.query.params);
+            }
+            return _this;
+        };
+        _this.where = function (whereClause, params) {
+            _this.query.wheres.push(whereClause);
+            addParamsToQuery(_this.query, params);
+            return _this;
+        };
+        _this.whereIf = function (whereClause, params, condition) {
+            if (condition) {
+                _this.where(whereClause, params);
+            }
+            return _this;
+        };
+        // Commit Methods
+        _this.all = function (onSuccess) {
+            _this.commit(onSuccess);
+        };
+        _this.commit = function (onSuccess, query) {
+            if (query === void 0) { query = _this.query; }
+            var sql = sql_1.select(_this.model.table, query);
+            _super.prototype.commitAction.call(_this, sql, query.params, function (rows) {
+                var processedRows = rows;
+                if (query.shouldProcess) {
+                    // processedRows = this.model.process(rows, this.processOptions);
+                    processedRows = _this.executeMiddleware(rows);
+                }
+                onSuccess(processedRows);
+            });
+        };
+        _this.count = function (includeCount) {
+            if (typeof includeCount === 'boolean') {
+                _this.includeCount = includeCount;
+            }
+            else if (typeof includeCount === 'function') {
+                var onSuccess_1 = includeCount;
+                var countQuery = __assign(__assign({}, _this.query), { columns: 'count (*) as the_count', orders: '' });
+                _this.first(function (result) {
+                    var count;
+                    if (result) {
+                        count = parseInt(result.the_count, 10);
+                        onSuccess_1(count);
+                    }
+                }, countQuery);
+            }
+        };
+        _this.first = function (onSuccess, query) {
+            if (query === void 0) { query = _this.query; }
+            _this.commit(function (rows) {
+                var firstRow = rows[0];
+                onSuccess(firstRow);
+            }, query);
+        };
         _this.query.alias = alias_1.tableAlias(_this.model.table);
         _this.query.columns = columns || '*';
         _this.processOptions = processOptions;
         return _this;
     }
-    // Query-building Methods
-    SelectAction.prototype.alias = function (aliasName) {
-        this.query.alias = aliasName;
-        return this;
-    };
-    SelectAction.prototype.columns = function (columns) {
-        this.query.columns = columns;
-        return this;
-    };
-    SelectAction.prototype.groupBy = function (groupBys) {
-        this.query.groupBy = groupBys;
-        return this;
-    };
-    SelectAction.prototype.group_by = function (group_bys) {
-        return this.groupBy(group_bys);
-    };
-    SelectAction.prototype.join = function (join, params, type) {
-        type = type || 'JOIN';
-        this.joins.push(type + " " + join);
-        this.query.joins = this.joins.join(' ');
-        addParamsToQuery(this.query, params);
-        return this;
-    };
-    SelectAction.prototype.limit = function (limit) {
-        this.query.limit = limit;
-        return this;
-    };
-    SelectAction.prototype.offset = function (offset) {
-        this.query.offset = offset;
-        return this;
-    };
-    SelectAction.prototype.orders = function (orderBys) {
-        this.query.orders = orderBys;
-        return this;
-    };
-    SelectAction.prototype.params = function (params) {
-        this.query.params = params;
-        return this;
-    };
-    SelectAction.prototype.process = function (shouldProcess) {
-        if (typeof shouldProcess === 'object') {
-            this.processOptions = shouldProcess;
-            this.query.shouldProcess = true;
-        }
-        else {
-            this.query.shouldProcess = shouldProcess;
-        }
-        return this;
-    };
-    SelectAction.prototype.sql = function (callback) {
-        var sql = sql_1.select(this.model.table, this.query);
-        if (callback) {
-            callback(sql, this.query.params);
-        }
-        else {
-            console.log(sql, this.query.params);
-        }
-        return this;
-    };
-    SelectAction.prototype.where = function (whereClause, params) {
-        this.query.wheres.push(whereClause);
-        addParamsToQuery(this.query, params);
-        return this;
-    };
-    SelectAction.prototype.whereIf = function (whereClause, params, condition) {
-        if (condition) {
-            this.where(whereClause, params);
-        }
-        return this;
-    };
-    SelectAction.prototype.where_if = function (where_clause, params, condition) {
-        return this.whereIf(where_clause, params, condition);
-    };
-    // Commit Methods
-    SelectAction.prototype.all = function (onSuccess) {
-        this.commit(onSuccess);
-    };
-    SelectAction.prototype.commit = function (onSuccess, query) {
-        var _this = this;
-        if (query === void 0) { query = this.query; }
-        var sql = sql_1.select(this.model.table, query);
-        _super.prototype.commitAction.call(this, sql, query.params, function (rows) {
-            var processedRows = rows;
-            if (query.shouldProcess) {
-                // processedRows = this.model.process(rows, this.processOptions);
-                processedRows = _this.executeMiddleware(rows);
-            }
-            onSuccess(processedRows);
-        });
-    };
-    SelectAction.prototype.count = function (includeCount) {
-        if (typeof includeCount === 'boolean') {
-            this.includeCount = includeCount;
-        }
-        else if (typeof includeCount === 'function') {
-            var onSuccess_1 = includeCount;
-            var countQuery = __assign(__assign({}, this.query), { columns: 'count (*) as the_count', orders: '' });
-            this.first(function (result) {
-                var count;
-                if (result) {
-                    count = parseInt(result.the_count, 10);
-                    onSuccess_1(count);
-                }
-            }, countQuery);
-        }
-    };
-    SelectAction.prototype.first = function (onSuccess, query) {
-        if (query === void 0) { query = this.query; }
-        this.commit(function (rows) {
-            var firstRow = rows[0];
-            onSuccess(firstRow);
-        }, query);
-    };
     SelectAction.prototype.executeMiddleware = function (results) {
         var _this = this;
         var processed = results;

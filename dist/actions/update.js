@@ -20,6 +20,18 @@ var UpdateAction = /** @class */ (function (_super) {
     function UpdateAction(model, executor, data) {
         var _this = _super.call(this, model, executor) || this;
         _this.query = {};
+        _this.where = function (where, params) {
+            _this.query.where = where;
+            _this.query.params = _this.query.params.concat(params);
+            return _this;
+        };
+        _this.commit = function (onSuccess) {
+            var sets = _this.query.sets.join(', ');
+            var sql = sql_1.update(_this.model.table, sets, _this.query.params, _this.query.where);
+            _super.prototype.commitAction.call(_this, sql, _this.query.params, function () {
+                onSuccess(_this.data);
+            });
+        };
         _this.data = data;
         _this.parseData(data);
         if (typeof data.id !== 'undefined') {
@@ -34,19 +46,6 @@ var UpdateAction = /** @class */ (function (_super) {
                 _this.query.sets.push(fieldName + " = ?");
                 _this.query.params.push(data[fieldName]);
             }
-        });
-    };
-    UpdateAction.prototype.where = function (where, params) {
-        this.query.where = where;
-        this.query.params = this.query.params.concat(params);
-        return this;
-    };
-    UpdateAction.prototype.commit = function (onSuccess) {
-        var _this = this;
-        var sets = this.query.sets.join(', ');
-        var sql = sql_1.update(this.model.table, sets, this.query.params, this.query.where);
-        _super.prototype.commitAction.call(this, sql, this.query.params, function () {
-            onSuccess(_this.data);
         });
     };
     return UpdateAction;

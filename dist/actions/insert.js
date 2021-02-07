@@ -19,6 +19,14 @@ var InsertAction = /** @class */ (function (_super) {
     __extends(InsertAction, _super);
     function InsertAction(model, executor, data, dates) {
         var _this = _super.call(this, model, executor) || this;
+        _this.commit = function (onSuccess) {
+            var _a = sql_1.insert(_this.model.table, _this.data), sql = _a[0], paramValues = _a[1];
+            _super.prototype.commitAction.call(_this, sql, paramValues, function (rows) {
+                if (onSuccess) {
+                    onSuccess(rows[0]);
+                }
+            });
+        };
         _this.data = data;
         if (dates && dates.createdAt) {
             _this.data.created_at = new Date();
@@ -28,14 +36,6 @@ var InsertAction = /** @class */ (function (_super) {
         }
         return _this;
     }
-    InsertAction.prototype.commit = function (onSuccess) {
-        var _a = sql_1.insert(this.model.table, this.data), sql = _a[0], paramValues = _a[1];
-        _super.prototype.commitAction.call(this, sql, paramValues, function (rows) {
-            if (onSuccess) {
-                onSuccess(rows[0]);
-            }
-        });
-    };
     return InsertAction;
 }(action_1["default"]));
 function default_1(execute, model, data, dates) {

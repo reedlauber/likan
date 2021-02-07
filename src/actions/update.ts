@@ -27,13 +27,13 @@ class UpdateAction extends Action {
     });
   }
 
-  where(where: string, params: SqlParams) {
+  where = (where: string, params: SqlParams) => {
     this.query.where = where;
     this.query.params = this.query.params.concat(params);
     return this;
   }
 
-  commit(onSuccess: onUpdateSuccess) {
+  commit = (onSuccess: onUpdateSuccess) => {
     const sets = this.query.sets.join(', ');
     const sql = updateSql(this.model.table, sets, this.query.params, this.query.where);
     super.commitAction(sql, this.query.params, () => {

@@ -19,14 +19,14 @@ var ImportAction = /** @class */ (function (_super) {
     __extends(ImportAction, _super);
     function ImportAction(model, executor, filePath, columns) {
         var _this = _super.call(this, model, executor) || this;
+        _this.commit = function (onSuccess) {
+            var sql = sql_1["import"](_this.model.table, _this.filePath, _this.columns);
+            _super.prototype.commitAction.call(_this, sql, [], onSuccess);
+        };
         _this.columns = columns;
         _this.filePath = filePath;
         return _this;
     }
-    ImportAction.prototype.commit = function (onSuccess) {
-        var sql = sql_1["import"](this.model.table, this.filePath, this.columns);
-        _super.prototype.commitAction.call(this, sql, [], onSuccess);
-    };
     return ImportAction;
 }(action_1["default"]));
 function default_1(executor, model, filePath, columns) {

@@ -20,7 +20,7 @@ class InsertAction extends Action {
     }
   }
 
-  commit(onSuccess?: (result: any | undefined) => void) {
+  commit = (onSuccess?: (result: any | undefined) => void) => {
     const [sql, paramValues] = insertSql(this.model.table, this.data);
     super.commitAction(sql, paramValues, (rows: any[]) => {
       if (onSuccess) {

@@ -18,12 +18,13 @@ var action_1 = require("./action");
 var TruncateAction = /** @class */ (function (_super) {
     __extends(TruncateAction, _super);
     function TruncateAction(model, executor) {
-        return _super.call(this, model, executor) || this;
+        var _this = _super.call(this, model, executor) || this;
+        _this.commit = function (onSuccess) {
+            var sql = sql_1.truncate(_this.model.table);
+            _super.prototype.commitAction.call(_this, sql, [], onSuccess);
+        };
+        return _this;
     }
-    TruncateAction.prototype.commit = function (onSuccess) {
-        var sql = sql_1.truncate(this.model.table);
-        _super.prototype.commitAction.call(this, sql, [], onSuccess);
-    };
     return TruncateAction;
 }(action_1["default"]));
 function default_1(executor, model) {

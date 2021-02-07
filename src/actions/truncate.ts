@@ -9,7 +9,7 @@ class TruncateAction extends Action {
     super(model, executor);
   }
 
-  commit(onSuccess: onQuerySuccess) {
+  commit = (onSuccess: onQuerySuccess) => {
     const sql = truncateSql(this.model.table);
     super.commitAction(sql, [], onSuccess);
   }

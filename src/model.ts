@@ -43,31 +43,31 @@ class Model {
     }, onError);
   }
 
-  delete(where: number | string, params: SqlParams) {
+  delete = (where: number | string, params: SqlParams) => {
     return actions.delete(this.executeQuery, this, where, params);
   }
 
-  import(filePath: string, columns: string[]) {
+  import = (filePath: string, columns: string[]) => {
     return actions.import(this.executeQuery, this, filePath, columns);
   }
 
-  insert(data: SqlData) {
+  insert = (data: SqlData) => {
     return actions.insert(this.executeQuery, this, data, this.options.dates);
   }
 
-  result(callback: (result: DbResult, processOptions?: Record<string, any>) => void) {
+  result = (callback: (result: DbResult, processOptions?: Record<string, any>) => void) => {
     this.resultsMiddleware.push(callback);
   }
 
-  select(columns: string, options: Record<string, any>) {
+  select = (columns: string, options: Record<string, any>) => {
     return actions.select(this.executeQuery, this, columns, options);
   }
 
-  truncate() {
+  truncate = () => {
     return actions.truncate(this.executeQuery, this);
   }
 
-  update(data: SqlData) {
+  update = (data: SqlData) => {
     return actions.update(this.executeQuery, this, data);
   }
 }

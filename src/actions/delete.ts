@@ -14,7 +14,7 @@ class DeleteAction extends Action {
     this.whereClause = '';
   }
 
-  where(where: number | string, params?: SqlParams): DeleteAction {
+  where = (where: number | string, params?: SqlParams): DeleteAction => {
     if (typeof where === 'number') {
       this.params = [where];
       this.whereClause = `id = ?`;
@@ -26,7 +26,7 @@ class DeleteAction extends Action {
     return this;
   }
 
-  commit(onSuccess: onQuerySuccess) {
+  commit = (onSuccess: onQuerySuccess) => {
     const sql = deleteSql(this.model.table, {
       params: this.params,
       where: this.whereClause,

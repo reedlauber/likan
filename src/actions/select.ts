@@ -31,25 +31,25 @@ class SelectAction extends Action {
 
   // Query-building Methods
 
-  alias(aliasName: string) {
+  alias = (aliasName: string) => {
     this.query.alias = aliasName;
     return this;
   }
 
-  columns(columns: string) {
+  columns = (columns: string) => {
     this.query.columns = columns;
     return this;
   }
 
-  groupBy(groupBys: string) {
+  groupBy = (groupBys: string) => {
     this.query.groupBy = groupBys;
     return this;
   }
-  group_by(group_bys: string) {
+  group_by = (group_bys: string) => {
     return this.groupBy(group_bys);
   }
 
-  join(join: string, params: SqlParamValue | SqlParams, type?: string) {
+  join = (join: string, params: SqlParamValue | SqlParams, type?: string) => {
     type = type || 'JOIN';
     this.joins.push(`${type} ${join}`);
     this.query.joins = this.joins.join(' ');
@@ -57,27 +57,27 @@ class SelectAction extends Action {
     return this;
   }
 
-  limit(limit: number) {
+  limit = (limit: number) => {
     this.query.limit = limit;
     return this;
   }
 
-  offset(offset: number) {
+  offset = (offset: number) => {
     this.query.offset = offset;
     return this;
   }
 
-  orders(orderBys: string) {
+  orders = (orderBys: string) => {
     this.query.orders = orderBys;
     return this;
   }
 
-  params(params: SqlParams) {
+  params = (params: SqlParams) => {
     this.query.params = params;
     return this;
   }
 
-  process(shouldProcess: boolean | Record<string, any>) {
+  process = (shouldProcess: boolean | Record<string, any>) => {
     if (typeof shouldProcess === 'object') {
       this.processOptions = shouldProcess;
       this.query.shouldProcess = true;
@@ -88,7 +88,7 @@ class SelectAction extends Action {
     return this;
   }
 
-  sql(callback?: (sql: string, params: SqlParams) => void) {
+  sql = (callback?: (sql: string, params: SqlParams) => void) => {
     const sql = selectSql(this.model.table, this.query);
 
     if (callback) {
@@ -100,29 +100,26 @@ class SelectAction extends Action {
     return this;
   }
 
-  where(whereClause: string, params: SqlParamValue | SqlParams) {
+  where = (whereClause: string, params: SqlParamValue | SqlParams) => {
     this.query.wheres.push(whereClause);
     addParamsToQuery(this.query, params);
     return this;
   }
 
-  whereIf(whereClause: string, params: SqlParamValue | SqlParams, condition: boolean) {
+  whereIf = (whereClause: string, params: SqlParamValue | SqlParams, condition: boolean) => {
     if (condition) {
       this.where(whereClause, params);
     }
     return this;
   }
-  where_if(where_clause: string, params: SqlParamValue | SqlParams, condition: boolean) {
-    return this.whereIf(where_clause, params, condition);
-  }
 
   // Commit Methods
 
-  all(onSuccess: onQuerySuccess) {
+  all = (onSuccess: onQuerySuccess) => {
     this.commit(onSuccess);
   }
 
-  commit(onSuccess: onQuerySuccess, query = this.query) {
+  commit = (onSuccess: onQuerySuccess, query = this.query) => {
     const sql = selectSql(this.model.table, query);
     super.commitAction(sql, query.params, (rows: any[]) => {
       let processedRows = rows;
@@ -136,7 +133,7 @@ class SelectAction extends Action {
     });
   }
 
-  count(includeCount: (boolean | CountCallback)) {
+  count = (includeCount: (boolean | CountCallback)) => {
     if (typeof includeCount === 'boolean') {
       this.includeCount = includeCount;
     } else if (typeof includeCount === 'function') {
@@ -157,7 +154,7 @@ class SelectAction extends Action {
     }
   }
 
-  first(onSuccess: onQuerySuccess, query = this.query) {
+  first = (onSuccess: onQuerySuccess, query = this.query) => {
     this.commit((rows) => {
       const [firstRow] = rows;
       onSuccess(firstRow);

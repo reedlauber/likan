@@ -15,7 +15,7 @@ class ImportAction extends Action {
     this.filePath = filePath;
   }
 
-  commit(onSuccess: onQuerySuccess) {
+  commit = (onSuccess: onQuerySuccess) => {
     const sql = importSql(this.model.table, this.filePath, this.columns);
     super.commitAction(sql, [], onSuccess);
   }

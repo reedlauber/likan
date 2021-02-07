@@ -6,7 +6,29 @@ var client_1 = require("./client");
 var processor = require("./processor");
 var Model = /** @class */ (function () {
     function Model(connectionString, table, options) {
+        var _this = this;
         this.resultsMiddleware = [];
+        this["delete"] = function (where, params) {
+            return actions["delete"](_this.executeQuery, _this, where, params);
+        };
+        this["import"] = function (filePath, columns) {
+            return actions["import"](_this.executeQuery, _this, filePath, columns);
+        };
+        this.insert = function (data) {
+            return actions.insert(_this.executeQuery, _this, data, _this.options.dates);
+        };
+        this.result = function (callback) {
+            _this.resultsMiddleware.push(callback);
+        };
+        this.select = function (columns, options) {
+            return actions.select(_this.executeQuery, _this, columns, options);
+        };
+        this.truncate = function () {
+            return actions.truncate(_this.executeQuery, _this);
+        };
+        this.update = function (data) {
+            return actions.update(_this.executeQuery, _this, data);
+        };
         this.table = table;
         this.options = options;
         this.client = new client_1["default"](connectionString, !!options.ssl);
@@ -24,27 +46,6 @@ var Model = /** @class */ (function () {
                 onSuccess(result.rows);
             }
         }, onError);
-    };
-    Model.prototype["delete"] = function (where, params) {
-        return actions["delete"](this.executeQuery, this, where, params);
-    };
-    Model.prototype["import"] = function (filePath, columns) {
-        return actions["import"](this.executeQuery, this, filePath, columns);
-    };
-    Model.prototype.insert = function (data) {
-        return actions.insert(this.executeQuery, this, data, this.options.dates);
-    };
-    Model.prototype.result = function (callback) {
-        this.resultsMiddleware.push(callback);
-    };
-    Model.prototype.select = function (columns, options) {
-        return actions.select(this.executeQuery, this, columns, options);
-    };
-    Model.prototype.truncate = function () {
-        return actions.truncate(this.executeQuery, this);
-    };
-    Model.prototype.update = function (data) {
-        return actions.update(this.executeQuery, this, data);
     };
     return Model;
 }());
